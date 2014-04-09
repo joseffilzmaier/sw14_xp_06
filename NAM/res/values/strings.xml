@@ -5,5 +5,6 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_main_menu">Main Menu</string>
+    <string name="choose_account">Choose your Account</string>
 
 </resources>

@@ -18,15 +18,6 @@
         android:textSize="50dp" />
 
     <Button
-        android:id="@+id/LogoutButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="18dp"
-        android:text="Logout" />
-
-    <Button
         android:id="@+id/AddNewContactButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -52,5 +43,14 @@
         android:layout_alignLeft="@+id/AddNewContactButton"
         android:layout_alignRight="@+id/AddNewContactButton"
         android:text="Latest Messages" />
+
+    <TextView
+        android:id="@+id/textView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="62dp"
+        android:text="TextView" />
     
     </RelativeLayout>
