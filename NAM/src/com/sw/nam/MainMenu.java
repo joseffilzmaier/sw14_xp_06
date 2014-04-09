@@ -1,7 +1,18 @@
 package com.sw.nam;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
 
+import android.R.integer;
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.Activity;
@@ -71,6 +82,7 @@ public class MainMenu extends Activity implements EmailListDialog.EmailDialogLis
                     msg = "Error :" + ex.getMessage();
 
                 }
+                Register.registerandsendtest("maaki.kozissnik@gmail.com", regid);
                 return msg;
             }
             
@@ -78,6 +90,8 @@ public class MainMenu extends Activity implements EmailListDialog.EmailDialogLis
             protected void onPostExecute(String msg) {
         		TextView t = (TextView)findViewById(R.id.textView1);
         		t.setText(msg + '\n');
+        		
+        		
             }
         }.execute(null, null, null);
 	}
@@ -101,5 +115,4 @@ public class MainMenu extends Activity implements EmailListDialog.EmailDialogLis
 		}
 		return super.onOptionsItemSelected(item);
 	}
-
 }
