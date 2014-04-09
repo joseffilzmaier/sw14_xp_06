@@ -1,44 +1,26 @@
 package com.sw.nam;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Map.Entry;
 
-import android.R.integer;
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.Activity;
-import android.app.ActionBar;
-import android.app.DialogFragment;
-import android.app.Fragment;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
 import android.widget.TextView;
-import android.os.Build;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
-import com.sw.nam.EmailListDialog;
 
-public class MainMenu extends Activity implements EmailListDialog.EmailDialogListener {
+public class MainMenu extends Activity {
 
 	Account[] accounts_;
+	Account google_account;
+	String regid;
     GoogleCloudMessaging gcm;
-    String regid;
     String PROJECT_NUMBER = "83287728691";
 	
 	@Override
@@ -47,23 +29,19 @@ public class MainMenu extends Activity implements EmailListDialog.EmailDialogLis
 		
  		Context context = getApplicationContext();
 		accounts_ = AccountManager.get(context).getAccounts();
-		String[] account_names = new String[accounts_.length];
-		
-		for (int i=0 ; i < accounts_.length ; i++){
-			account_names[i] = accounts_[i].name;
+
+		if (accounts_.length == 0){
+			//TODO No Google Account error Message
+			System.exit(0);
 		}
+		
+		google_account = accounts_[0];
+		
+		getRegId();
 		
 		setContentView(R.layout.activity_main_menu);
-		DialogFragment email_dialog = EmailListDialog.newInstance(account_names); 
-		email_dialog.show(getFragmentManager(), "dialog");
-		
 		
 	}
-	
-	@Override
-	public void onEmailSelected(int which){
-		getRegId();
-		}
 	
 	public void getRegId(){
         new AsyncTask<Void, Void, String>() {
