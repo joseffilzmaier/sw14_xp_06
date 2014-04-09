@@ -1,9 +1,12 @@
 package com.sw.nam;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.app.Activity;
 import android.app.ActionBar;
 import android.app.Fragment;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -16,12 +19,13 @@ public class MainMenu extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		
+		//Account[] accounts = AccountManager.get(this).getAccounts();
+		Log.d("Test","This is a Log Test Message");
+		
 		setContentView(R.layout.activity_main_menu);
 
-		if (savedInstanceState == null) {
-			getFragmentManager().beginTransaction()
-					.add(R.id.container, new PlaceholderFragment()).commit();
-		}
 	}
 
 	@Override
@@ -42,23 +46,6 @@ public class MainMenu extends Activity {
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
-	}
-
-	/**
-	 * A placeholder fragment containing a simple view.
-	 */
-	public static class PlaceholderFragment extends Fragment {
-
-		public PlaceholderFragment() {
-		}
-
-		@Override
-		public View onCreateView(LayoutInflater inflater, ViewGroup container,
-				Bundle savedInstanceState) {
-			View rootView = inflater.inflate(R.layout.fragment_main_menu,
-					container, false);
-			return rootView;
-		}
 	}
 
 }

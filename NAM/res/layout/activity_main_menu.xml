@@ -1,7 +1,56 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.sw.nam.MainMenu"
-    tools:ignore="MergeRootFrame" />
+    tools:ignore="MergeRootFrame" >
+    
+    <TextView
+        android:id="@+id/MainMenuTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"
+        android:text="Main Menu"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textSize="50dp" />
+
+    <Button
+        android:id="@+id/LogoutButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="18dp"
+        android:text="Logout" />
+
+    <Button
+        android:id="@+id/AddNewContactButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/MainMenuTextView"
+        android:layout_alignRight="@+id/MainMenuTextView"
+        android:layout_centerVertical="true"
+        android:text="Add new Contact" />
+
+    <Button
+        android:id="@+id/ViewContactsButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/AddNewContactButton"
+        android:layout_alignRight="@+id/AddNewContactButton"
+        android:layout_below="@+id/AddNewContactButton"
+        android:text="View Contacts" />
+
+    <Button
+        android:id="@+id/LatestMessagesButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/AddNewContactButton"
+        android:layout_alignLeft="@+id/AddNewContactButton"
+        android:layout_alignRight="@+id/AddNewContactButton"
+        android:text="Latest Messages" />
+    
+    </RelativeLayout>
