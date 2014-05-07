@@ -6,6 +6,7 @@ import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -22,25 +23,40 @@ public class MainMenu extends Activity {
 	String regid;
     GoogleCloudMessaging gcm;
     String PROJECT_NUMBER = "83287728691";
+    public static final String PREFS_NAME = "nam_prefs";
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
- 		Context context = getApplicationContext();
-		accounts_ = AccountManager.get(context).getAccounts();
-
-		if (accounts_.length == 0){
-			//TODO No Google Account error Message
-			System.exit(0);
-		}
+	    SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+	    boolean is_registered = settings.getBoolean("registered", false);
 		
-		google_account = accounts_[0];
-		
-		getRegId();
-		
+	 		Context context = getApplicationContext();
+			accounts_ = AccountManager.get(context).getAccounts();
+	
+			if (accounts_.length == 0){
+				//TODO No Google Account error Message
+				System.exit(0);
+			}
+			google_account = accounts_[0];
+			
+		if(!is_registered){
+			getRegId();
+			SharedPreferences.Editor editor = settings.edit();
+			//editor.putBoolean("registered", true);
+			//editor.commit();
+	    }
+	    else
+	    {
+		    String load_reg_id = settings.getString("registration_id", "Error");
+	    	regid = load_reg_id;
+	    	Log.d("GCM", "Account already registered on this device!");
+	    }
+		Log.d("GCM", "Registration ID: " + regid);
 		setContentView(R.layout.activity_main_menu);
-		
+		TextView t = (TextView)findViewById(R.id.textView1);
+		t.setText("Registered as: " + google_account.name);
 	}
 	
 	public void getRegId(){
@@ -54,22 +70,24 @@ public class MainMenu extends Activity {
                     }
                     regid = gcm.register(PROJECT_NUMBER);
                     msg = "Device registered, registration ID=" + regid;
+                    SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+        			SharedPreferences.Editor editor = settings.edit();
+        			editor.putString("registration_id", regid);
+        			editor.putBoolean("registered", true);
+        			editor.commit();
                     Log.i("GCM",  msg);
 
                 } catch (IOException ex) {
                     msg = "Error :" + ex.getMessage();
 
                 }
-                Register.registerandsendtest("maaki.kozissnik@gmail.com", regid);
+                Log.i("GCM","Register Response:" + Register.registerandsendtest(google_account.name, regid));
+                
                 return msg;
             }
             
             @Override
             protected void onPostExecute(String msg) {
-        		TextView t = (TextView)findViewById(R.id.textView1);
-        		t.setText(msg + '\n');
-        		
-        		
             }
         }.execute(null, null, null);
 	}

@@ -22,15 +22,15 @@ public class Register {
         params.put("chatId", email);
         params.put("regId", regId);
         
+        String response = "";
+        
         try {
-        	Log.d("test", "ServerUrl: " + serverUrl + " " + "Params: " + params.get("chatId") + " ; " + params.get("regId"));
-        	String Blubb = executePost(serverUrl, params);
-        	Log.d("test", Blubb);
-        	
+        	Log.d("GCM", "ServerUrl: " + serverUrl + " " + "Params: " + params.get("chatId") + " ; " + params.get("regId"));
+        	response = executePost(serverUrl, params);
         	
         } catch (IOException e) {
         }
-        return null;
+        return response;
     }
 	
 	 private static String executePost(String endpoint, Map<String, String> params) throws IOException {
@@ -88,7 +88,6 @@ public class Register {
 	                conn.disconnect();
 	            }
 	        }
-	        Log.d("test", "Response: " + response.toString());
 	        return response.toString();
 	      }
 
