@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.appsrox.instachat"
+    package="com.sw.nam"
     android:versionCode="1"
     android:versionName="1.0" >
 
@@ -9,10 +9,10 @@
         android:targetSdkVersion="18" />
 
     <permission
-        android:name="com.appsrox.instachat.permission.C2D_MESSAGE"
+        android:name="com.sw.nam.permission.C2D_MESSAGE"
         android:protectionLevel="signature" />
 
-    <uses-permission android:name="com.appsrox.instachat.permission.C2D_MESSAGE" />
+    <uses-permission android:name="com.sw.nam.permission.C2D_MESSAGE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
@@ -20,38 +20,38 @@
     <uses-permission android:name="android.permission.READ_CONTACTS" />
 
     <application
-        android:name="com.appsrox.instachat.Common"
+        android:name="com.sw.nam.Common"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
-        <activity android:name="com.appsrox.instachat.MainActivity" >
+        <activity android:name="com.sw.nam.MainActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.appsrox.instachat.ChatActivity" 
+        <activity android:name="com.sw.nam.ChatActivity" 
             />
         <activity
-            android:name="com.appsrox.instachat.SettingsActivity"
+            android:name="com.sw.nam.SettingsActivity"
             android:label="@string/title_activity_settings" 
             />
 
         <receiver
-            android:name="com.appsrox.instachat.client.GcmBroadcastReceiver"
+            android:name="com.sw.nam.client.GcmBroadcastReceiver"
             android:permission="com.google.android.c2dm.permission.SEND" >
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
 
-                <category android:name="com.appsrox.instachat" />
+                <category android:name="com.sw.nam" />
             </intent-filter>
         </receiver>
 
         <provider
-            android:name="com.appsrox.instachat.DataProvider"
-            android:authorities="com.appsrox.instachat.provider"
+            android:name="com.sw.nam.DataProvider"
+            android:authorities="com.sw.nam.provider"
             android:exported="false" >
         </provider>
     </application>

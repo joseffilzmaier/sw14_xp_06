@@ -6,7 +6,7 @@
 
     <fragment
         android:id="@+id/msg_list"
-        android:name="com.appsrox.instachat.MessagesFragment"
+        android:name="com.sw.nam.MessagesFragment"
         android:layout_width="match_parent"
         android:layout_height="0dip"
         android:layout_weight="1" />
