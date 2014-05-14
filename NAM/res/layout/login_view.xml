@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/RelativeLayout1"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:columnCount="2"
+    android:orientation="horizontal"
+    android:paddingTop="@dimen/activity_vertical_margin" >
+
+    <Space
+        android:id="@+id/Space1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_column="1"
+        android:layout_gravity="fill_vertical"
+        android:layout_row="1" />
+
+    <GridLayout
+        android:id="@+id/GridLayout2"
+        android:layout_width="294dp"
+        android:layout_height="103dp"
+        android:layout_below="@+id/GridLayout3"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="82dp"
+        android:columnCount="1" >
+
+        <EditText
+            android:id="@+id/editText1"
+            android:layout_column="0"
+            android:layout_gravity="center_horizontal|top"
+            android:layout_row="0"
+            android:ems="10"
+            android:hint="e-mail"
+            android:inputType="textEmailAddress"
+            android:paddingTop="@dimen/activity_vertical_margin"
+            android:textAlignment="inherit" >
+
+            <requestFocus />
+        </EditText>
+
+        <EditText
+            android:id="@+id/EditText01"
+            android:layout_column="0"
+            android:layout_gravity="center_horizontal|bottom"
+            android:layout_row="0"
+            android:ems="10"
+            android:hint="password"
+            android:inputType="textEmailAddress|textPassword"
+            android:textAlignment="inherit"
+            android:textIsSelectable="true" />
+    </GridLayout>
+
+    <GridLayout
+        android:id="@+id/GridLayout3"
+        android:layout_width="wrap_content"
+        android:layout_height="98dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="84dp"
+        android:columnCount="1" >
+
+        <TextView
+            android:id="@+id/TextView01"
+            android:layout_column="0"
+            android:layout_gravity="right|bottom"
+            android:layout_row="0"
+            android:text="Messenger"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+
+        <TextView
+            android:id="@+id/TextView02"
+            android:layout_column="0"
+            android:layout_gravity="left|center_vertical"
+            android:layout_row="0"
+            android:text="A"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_column="0"
+            android:layout_gravity="left|top"
+            android:layout_row="0"
+            android:text="Not"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+    </GridLayout>
+
+</RelativeLayout>
