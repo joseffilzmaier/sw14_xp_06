@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -22,7 +23,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.sw.nam.R;
 import com.sw.nam.DataProvider.MessageType;
 import com.sw.nam.client.GcmUtil;
 import com.sw.nam.client.ServerUtilities;
@@ -41,19 +41,30 @@ EditContactDialog.OnFragmentInteractionListener, OnClickListener {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.chat_activity);
-
-		profileId = getIntent().getStringExtra(Common.PROFILE_ID);
+		
 		msgEdit = (EditText) findViewById(R.id.msg_edit);
 		sendBtn = (Button) findViewById(R.id.send_btn);
 		sendBtn.setOnClickListener(this);
 		ActionBar actionBar = getSupportActionBar();
 		actionBar.setHomeButtonEnabled(true);
 		actionBar.setDisplayHomeAsUpEnabled(true);
+		Cursor c;
+		
+		if(getIntent().getBooleanExtra(Common.IS_NOTIF, false)) {
+			String senderEmail = getIntent().getStringExtra(Common.PROFILE_NAME);
+			Log.d("main", senderEmail);
+			c = getContentResolver().query(DataProvider.CONTENT_URI_PROFILE, 
+					null, DataProvider.COL_EMAIL + " LIKE ?", new String[]{senderEmail}, null);
 
-		Cursor c = getContentResolver().query(Uri.withAppendedPath(DataProvider.CONTENT_URI_PROFILE, profileId), null, null, null, null);
+		} else {
+			profileId = getIntent().getStringExtra(Common.PROFILE_ID);
+			c = getContentResolver().query(Uri.withAppendedPath(DataProvider.CONTENT_URI_PROFILE, profileId), 
+				null, null, null, null);
+		}
 		if (c.moveToFirst()) {
 			profileName = c.getString(c.getColumnIndex(DataProvider.COL_NAME));
 			profileEmail = c.getString(c.getColumnIndex(DataProvider.COL_EMAIL));
+			profileId = c.getString(c.getColumnIndex(DataProvider.COL_ID));
 			actionBar.setTitle(profileName);
 		}
 		actionBar.setSubtitle("connecting ...");

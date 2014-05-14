@@ -16,8 +16,6 @@ public class DataProvider extends ContentProvider {
 	public static final Uri CONTENT_URI_MESSAGES = Uri.parse("content://com.sw.nam.provider/messages");
 	public static final Uri CONTENT_URI_PROFILE = Uri.parse("content://com.sw.nam.provider/profile");
 
-	public static final String COL_ID = "_id";
-
 	public enum MessageType {
 
     	INCOMING, OUTGOING
@@ -39,6 +37,7 @@ public class DataProvider extends ContentProvider {
 
 	// TABLE PROFILE
 	public static final String TABLE_PROFILE = "profile";
+	public static final String COL_ID = "_id";
 	public static final String COL_NAME = "name";
 	public static final String COL_EMAIL = "email";
 	public static final String COL_COUNT = "count";
@@ -49,6 +48,7 @@ public class DataProvider extends ContentProvider {
 	private static final int MESSAGES_SINGLE_ROW = 2;
 	private static final int PROFILE_ALLROWS = 3;
 	private static final int PROFILE_SINGLE_ROW = 4;
+	private static final int PROFILE_SINGLE_ROW_NAME = 5;
 
 	private static final UriMatcher uriMatcher;
 	static {
@@ -88,7 +88,7 @@ public class DataProvider extends ContentProvider {
 			qb.setTables(TABLE_PROFILE);
 			qb.appendWhere("_id = " + uri.getLastPathSegment());
 			break;
-
+	
 		default:
 			throw new IllegalArgumentException("Unsupported URI: " + uri);			
 		}
@@ -209,7 +209,7 @@ public class DataProvider extends ContentProvider {
 					+ COL_TIME 			  +" datetime default current_timestamp);");
 
 			db.execSQL("create table profile("
-					+ "_id integer primary key autoincrement, "
+					+ COL_ID + " integer primary key autoincrement, "
 					+ COL_NAME 	  +" text, "
 					+ COL_EMAIL   +" text unique, "
 					+ COL_COUNT   +" integer default 0);");

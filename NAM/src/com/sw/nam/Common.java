@@ -15,8 +15,11 @@ import com.sw.nam.client.Constants;
 public class Common extends Application {
 	
 	public static final String PROFILE_ID = "profile_id";
+	public static final String PROFILE_NAME = "profile_name";
 	public static final String ACTION_REGISTER = "com.sw.nam.REGISTER";
 	public static final String EXTRA_STATUS = "status";
+	public static final String IS_NOTIF = "is_notif";
+	
 	public static final int STATUS_SUCCESS = 1;
 	public static final int STATUS_FAILED = 0;
 	public static String[] email_arr;
@@ -40,7 +43,12 @@ public class Common extends Application {
 		}
 		return lst;
 	}
-	
+	/*
+	public static String getIdByEmail(String email) {
+		List<String> lst = getEmailList();
+		return String.valueOf(lst.indexOf(email));	
+	}
+	*/
 	public static String getPreferredEmail() {
 		return prefs.getString("chat_email_id", email_arr.length==0 ? "" : email_arr[0]);
 	}

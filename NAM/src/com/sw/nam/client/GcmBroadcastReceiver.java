@@ -13,12 +13,12 @@ import android.os.PowerManager.WakeLock;
 import android.support.v4.app.NotificationCompat;
 import android.text.TextUtils;
 
-import com.sw.nam.R;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
+import com.sw.nam.ChatActivity;
 import com.sw.nam.Common;
 import com.sw.nam.DataProvider;
-import com.sw.nam.MainActivity;
 import com.sw.nam.DataProvider.MessageType;
+import com.sw.nam.R;
 
 public class GcmBroadcastReceiver extends BroadcastReceiver {
 	
@@ -35,9 +35,9 @@ public class GcmBroadcastReceiver extends BroadcastReceiver {
 			GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(context);
 			String messageType = gcm.getMessageType(intent);
 			if (GoogleCloudMessaging.MESSAGE_TYPE_SEND_ERROR.equals(messageType)) {
-				sendNotification("Send error", false);
+				sendNotification("Send error");
 			} else if (GoogleCloudMessaging.MESSAGE_TYPE_DELETED.equals(messageType)) {
-				sendNotification("Deleted messages on server", false);
+				sendNotification("Deleted messages on server");
 			} else {
 				String msg = intent.getStringExtra(DataProvider.COL_MESSAGE);
 				String senderEmail = intent.getStringExtra(DataProvider.COL_SENDER_EMAIL);
@@ -50,7 +50,7 @@ public class GcmBroadcastReceiver extends BroadcastReceiver {
 				context.getContentResolver().insert(DataProvider.CONTENT_URI_MESSAGES, values);
 				
 				if (Common.isNotify()) {
-					sendNotification("New message", true);
+					newMessageNotification("New message", senderEmail);
 				}
 			}
 			setResultCode(Activity.RESULT_OK);
@@ -58,8 +58,27 @@ public class GcmBroadcastReceiver extends BroadcastReceiver {
 			mWakeLock.release();
 		}
 	}
-
-	private void sendNotification(String text, boolean launchApp) {
+	private void newMessageNotification(String text,  String senderEmail) {
+		NotificationManager mNotificationManager = (NotificationManager) ctx.getSystemService(Context.NOTIFICATION_SERVICE);
+		NotificationCompat.Builder notification = new NotificationCompat.Builder(ctx);
+		notification.setContentTitle(ctx.getString(R.string.app_name)+"-"+text);
+		notification.setContentText(senderEmail);
+		notification.setAutoCancel(true);
+		notification.setSmallIcon(R.drawable.ic_launcher);
+		if (!TextUtils.isEmpty(Common.getRingtone())) {
+			notification.setSound(Uri.parse(Common.getRingtone()));
+		}
+				
+		Intent intent = new Intent(ctx, ChatActivity.class);
+		intent.putExtra(Common.IS_NOTIF, true);
+		intent.putExtra(Common.PROFILE_NAME, senderEmail);
+//		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+		PendingIntent pi = PendingIntent.getActivity(ctx, 0, intent, Intent.FLAG_ACTIVITY_NEW_TASK);
+		notification.setContentIntent(pi);
+		
+		mNotificationManager.notify(1, notification.build());
+	}
+	private void sendNotification(String text) {
 		NotificationManager mNotificationManager = (NotificationManager) ctx.getSystemService(Context.NOTIFICATION_SERVICE);
 		NotificationCompat.Builder notification = new NotificationCompat.Builder(ctx);
 		notification.setContentTitle(ctx.getString(R.string.app_name));
@@ -69,14 +88,6 @@ public class GcmBroadcastReceiver extends BroadcastReceiver {
 		if (!TextUtils.isEmpty(Common.getRingtone())) {
 			notification.setSound(Uri.parse(Common.getRingtone()));
 		}
-		
-		if (launchApp) {
-			Intent intent = new Intent(ctx, MainActivity.class);
-			intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-			PendingIntent pi = PendingIntent.getActivity(ctx, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-			notification.setContentIntent(pi);
-		}
-	
-		mNotificationManager.notify(1, notification.build());
+		mNotificationManager.notify(0, notification.build());
 	}
 }
