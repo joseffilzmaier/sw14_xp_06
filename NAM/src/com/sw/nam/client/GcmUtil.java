@@ -16,7 +16,7 @@ import com.sw.nam.Common;
 
 public class GcmUtil {
 	
-	private static final String TAG = "GcmUtil";
+	//private static final String TAG = "GcmUtil";
 	
 	public static final String PROPERTY_REG_ID = "registration_id";
 	private static final String PROPERTY_APP_VERSION = "appVersion";
