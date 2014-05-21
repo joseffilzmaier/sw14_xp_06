@@ -28,6 +28,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
 
+import android.util.Log;
+
 import com.sw.nam.Common;
 import com.sw.nam.DataProvider;
 
@@ -36,7 +38,7 @@ import com.sw.nam.DataProvider;
  */
 public final class ServerUtilities {
 
-	//private static final String TAG = "ServerUtilities";
+	// private static final String TAG = "ServerUtilities";
 
 	private static final int MAX_ATTEMPTS = 5;
 	private static final int BACKOFF_MILLI_SECONDS = 2000;
@@ -44,8 +46,11 @@ public final class ServerUtilities {
 
 	/**
 	 * Register this account/device pair within the server.
+	 * 
+	 * @throws IOException
 	 */
-	public static void register(final String email, final String regId) {
+	public static void register(final String email, final String regId)
+			throws IOException {
 
 		String serverUrl = Common.getServerUrl() + "/register";
 		Map<String, String> params = new HashMap<String, String>();
@@ -55,6 +60,7 @@ public final class ServerUtilities {
 		try {
 			post(serverUrl, params, MAX_ATTEMPTS);
 		} catch (IOException e) {
+			throw e;
 		}
 	}
 
@@ -82,15 +88,15 @@ public final class ServerUtilities {
 		Map<String, String> params = new HashMap<String, String>();
 		params.put(DataProvider.MESSAGE, msg);
 		params.put(DataProvider.SENDER_EMAIL, Common.getPreferredEmail());
-		params.put(DataProvider.RECEIVER_EMAIL, to);        
+		params.put(DataProvider.RECEIVER_EMAIL, to);
 		post(serverUrl, params, MAX_ATTEMPTS);
 	}
-	
+
 	/**
 	 * Add a contact.
 	 */
 	public static String contactRequest(String email) throws IOException {
-		
+
 		String response = " ";
 		String serverUrl = Common.getServerUrl() + "/contactRequest";
 		Map<String, String> params = new HashMap<String, String>();
@@ -100,7 +106,8 @@ public final class ServerUtilities {
 	}
 
 	/** Issue a POST with exponential backoff */
-	private static String post(String endpoint, Map<String, String> params, int maxAttempts) throws IOException {
+	private static String post(String endpoint, Map<String, String> params,
+			int maxAttempts) throws IOException {
 		long backoff = BACKOFF_MILLI_SECONDS + random.nextInt(1000);
 		String response = " ";
 		for (int i = 1; i <= maxAttempts; i++) {
@@ -119,7 +126,7 @@ public final class ServerUtilities {
 					Thread.currentThread().interrupt();
 					return response;
 				}
-				backoff *= 2;    			
+				backoff *= 2;
 			} catch (IllegalArgumentException e) {
 				throw new IOException(e.getMessage(), e);
 			}
@@ -129,17 +136,21 @@ public final class ServerUtilities {
 
 	/**
 	 * Issue a POST request to the server.
-	 *
-	 * @param endpoint POST address.
-	 * @param params request parameters.
-	 *
-	 * @throws IOException propagated from POST.
+	 * 
+	 * @param endpoint
+	 *            POST address.
+	 * @param params
+	 *            request parameters.
+	 * 
+	 * @throws IOException
+	 *             propagated from POST.
 	 */
-	private static String post(String endpoint, Map<String, String> params) throws IOException {
+	private static String post(String endpoint, Map<String, String> params)
+			throws IOException {
 		URL url;
 		StringBuffer response = new StringBuffer();
-		//String response = " ";
-		try {			
+		// String response = " ";
+		try {
 			url = new URL(endpoint);
 		} catch (MalformedURLException e) {
 			throw new IllegalArgumentException("invalid url: " + endpoint);
@@ -148,7 +159,8 @@ public final class ServerUtilities {
 		Iterator<Entry<String, String>> iterator = params.entrySet().iterator();
 		while (iterator.hasNext()) {
 			Entry<String, String> param = iterator.next();
-			bodyBuilder.append(param.getKey()).append('=').append(param.getValue());
+			bodyBuilder.append(param.getKey()).append('=')
+					.append(param.getValue());
 			if (iterator.hasNext()) {
 				bodyBuilder.append('&');
 			}
@@ -162,7 +174,8 @@ public final class ServerUtilities {
 			conn.setUseCaches(false);
 			conn.setFixedLengthStreamingMode(bytes.length);
 			conn.setRequestMethod("POST");
-			conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8");
+			conn.setRequestProperty("Content-Type",
+					"application/x-www-form-urlencoded;charset=UTF-8");
 			OutputStream out = conn.getOutputStream();
 			out.write(bytes);
 			out.close();
@@ -170,18 +183,15 @@ public final class ServerUtilities {
 			if (status != 200) {
 				throw new IOException("Post failed with error code " + status);
 			}
-			
-			
-			BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+
+			BufferedReader in = new BufferedReader(new InputStreamReader(
+					conn.getInputStream()));
 			String inputLine;
 			while ((inputLine = in.readLine()) != null) {
 				response.append(inputLine);
-				}
+			}
 			in.close();
 
-			
-			
-			//response = conn.getResponseMessage().toString();
 		} finally {
 			if (conn != null) {
 				conn.disconnect();

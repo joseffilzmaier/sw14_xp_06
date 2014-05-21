@@ -62,6 +62,10 @@ public class Common extends Application {
 		return prefs.getBoolean("notifications_new_message", true);
 	}
 	
+	public static boolean isVibrate() {
+		return prefs.getBoolean("notifications_new_message_vibrate", true);
+	}
+	
 	public static String getRingtone() {
 		return prefs.getString("notifications_new_message_ringtone", android.provider.Settings.System.DEFAULT_NOTIFICATION_URI.toString());
 	}

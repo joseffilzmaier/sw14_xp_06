@@ -1,6 +1,7 @@
 package com.sw.nam.client;
 
 import android.app.Activity;
+import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -85,6 +86,9 @@ public class GcmBroadcastReceiver extends BroadcastReceiver {
 		notification.setContentTitle(ctx.getString(R.string.app_name)+"-"+text);
 		notification.setContentText(senderEmail);
 		notification.setAutoCancel(true);
+		if(Common.isVibrate()) {
+			notification.setDefaults(Notification.DEFAULT_VIBRATE);
+		}
 		notification.setSmallIcon(R.drawable.ic_launcher);
 		if (!TextUtils.isEmpty(Common.getRingtone())) {
 			notification.setSound(Uri.parse(Common.getRingtone()));
@@ -93,9 +97,9 @@ public class GcmBroadcastReceiver extends BroadcastReceiver {
 		Intent intent = new Intent(ctx, ChatActivity.class);
 		intent.putExtra(Common.IS_NOTIF, true);
 		intent.putExtra(Common.PROFILE_NAME, senderEmail);
-		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-		
-		PendingIntent pi = PendingIntent.getActivity(ctx, 0, intent, Intent.FLAG_ACTIVITY_NEW_TASK);
+		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);		
+		//PendingIntent pi = PendingIntent.getActivity(ctx, 0, intent, Intent.FLAG_ACTIVITY_NEW_TASK);
+		PendingIntent pi = PendingIntent.getActivity(ctx, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 		notification.setContentIntent(pi);
 		
 		mNotificationManager.notify(1, notification.build());
@@ -106,6 +110,9 @@ public class GcmBroadcastReceiver extends BroadcastReceiver {
 		notification.setContentTitle(ctx.getString(R.string.app_name));
 		notification.setContentText(text);
 		notification.setAutoCancel(true);
+		if(Common.isVibrate()) {
+			notification.setDefaults(Notification.DEFAULT_VIBRATE);
+		}
 		notification.setSmallIcon(R.drawable.ic_launcher);
 		if (!TextUtils.isEmpty(Common.getRingtone())) {
 			notification.setSound(Uri.parse(Common.getRingtone()));

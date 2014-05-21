@@ -34,7 +34,7 @@ public class AddContactDialog extends DialogFragment {
 	@Override
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
 		et = new EditText(getActivity());
-		et.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
+		et.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
 		et.setHint("abc@example.com");
 		alertDialog = new AlertDialog.Builder(getActivity())
 				.setTitle("Add Contact").setMessage("Add Contact")
@@ -90,26 +90,20 @@ public class AddContactDialog extends DialogFragment {
 			result = new AsyncTask<Void, Void, String>() {
 				@Override
 				protected String doInBackground(Void... params) {
-					String resp = "NOTHING";
+					String resp = "";
 					try {
 						resp = ServerUtilities.contactRequest(email);
 					} catch (IOException ex) {
-						Log.d("test", "Exception: " + ex);
-						resp = "Contact request could not be sent";
 					}
 					return resp;
 				}
 
 				@Override
 				protected void onPostExecute(String result) {
-					// finalResult.setText(result);
-					Log.d("test", "Response: " + result);
 				}
 			}.execute(null, null, null).get();
 		} catch (Exception e) {
-			Log.d("test", "Exception");
 		}
-		Log.d("test", "Response: " + result);
 		return result;
 	}
 }
