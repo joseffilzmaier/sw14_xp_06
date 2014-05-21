@@ -15,7 +15,9 @@
  */
 package com.sw.nam.client;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -34,7 +36,7 @@ import com.sw.nam.DataProvider;
  */
 public final class ServerUtilities {
 
-	private static final String TAG = "ServerUtilities";
+	//private static final String TAG = "ServerUtilities";
 
 	private static final int MAX_ATTEMPTS = 5;
 	private static final int BACKOFF_MILLI_SECONDS = 2000;
@@ -83,16 +85,29 @@ public final class ServerUtilities {
 		params.put(DataProvider.RECEIVER_EMAIL, to);        
 		post(serverUrl, params, MAX_ATTEMPTS);
 	}
-
+	
+	/**
+	 * Add a contact.
+	 */
+	public static String contactRequest(String email) throws IOException {
+		
+		String response = " ";
+		String serverUrl = Common.getServerUrl() + "/contactRequest";
+		Map<String, String> params = new HashMap<String, String>();
+		params.put(DataProvider.COL_EMAIL, email);
+		response = post(serverUrl, params, MAX_ATTEMPTS);
+		return response;
+	}
 
 	/** Issue a POST with exponential backoff */
-	private static void post(String endpoint, Map<String, String> params, int maxAttempts) throws IOException {
+	private static String post(String endpoint, Map<String, String> params, int maxAttempts) throws IOException {
 		long backoff = BACKOFF_MILLI_SECONDS + random.nextInt(1000);
+		String response = " ";
 		for (int i = 1; i <= maxAttempts; i++) {
 
 			try {
-				post(endpoint, params);
-				return;
+				response = post(endpoint, params);
+				return response;
 			} catch (IOException e) {
 
 				if (i == maxAttempts) {
@@ -102,13 +117,14 @@ public final class ServerUtilities {
 					Thread.sleep(backoff);
 				} catch (InterruptedException e1) {
 					Thread.currentThread().interrupt();
-					return;
+					return response;
 				}
 				backoff *= 2;    			
 			} catch (IllegalArgumentException e) {
 				throw new IOException(e.getMessage(), e);
 			}
 		}
+		return response;
 	}
 
 	/**
@@ -119,16 +135,17 @@ public final class ServerUtilities {
 	 *
 	 * @throws IOException propagated from POST.
 	 */
-	private static void post(String endpoint, Map<String, String> params) throws IOException {
+	private static String post(String endpoint, Map<String, String> params) throws IOException {
 		URL url;
-		try {
+		StringBuffer response = new StringBuffer();
+		//String response = " ";
+		try {			
 			url = new URL(endpoint);
 		} catch (MalformedURLException e) {
 			throw new IllegalArgumentException("invalid url: " + endpoint);
 		}
 		StringBuilder bodyBuilder = new StringBuilder();
 		Iterator<Entry<String, String>> iterator = params.entrySet().iterator();
-
 		while (iterator.hasNext()) {
 			Entry<String, String> param = iterator.next();
 			bodyBuilder.append(param.getKey()).append('=').append(param.getValue());
@@ -137,7 +154,6 @@ public final class ServerUtilities {
 			}
 		}
 		String body = bodyBuilder.toString();
-
 		byte[] bytes = body.getBytes();
 		HttpURLConnection conn = null;
 		try {
@@ -147,20 +163,31 @@ public final class ServerUtilities {
 			conn.setFixedLengthStreamingMode(bytes.length);
 			conn.setRequestMethod("POST");
 			conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8");
-
 			OutputStream out = conn.getOutputStream();
 			out.write(bytes);
 			out.close();
-
 			int status = conn.getResponseCode();
 			if (status != 200) {
 				throw new IOException("Post failed with error code " + status);
 			}
+			
+			
+			BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+			String inputLine;
+			while ((inputLine = in.readLine()) != null) {
+				response.append(inputLine);
+				}
+			in.close();
+
+			
+			
+			//response = conn.getResponseMessage().toString();
 		} finally {
 			if (conn != null) {
 				conn.disconnect();
 			}
 		}
+		return response.toString();
 	}
 
 }

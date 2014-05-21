@@ -48,7 +48,7 @@ public class DataProvider extends ContentProvider {
 	private static final int MESSAGES_SINGLE_ROW = 2;
 	private static final int PROFILE_ALLROWS = 3;
 	private static final int PROFILE_SINGLE_ROW = 4;
-	private static final int PROFILE_SINGLE_ROW_NAME = 5;
+	//private static final int PROFILE_SINGLE_ROW_NAME = 5;
 
 	private static final UriMatcher uriMatcher;
 	static {
