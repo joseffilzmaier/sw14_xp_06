@@ -2,11 +2,8 @@ package com.sw.nam;
 
 import java.io.IOException;
 
-import android.content.BroadcastReceiver;
 import android.content.ContentValues;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -24,7 +21,6 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.sw.nam.DataProvider.MessageType;
-import com.sw.nam.client.GcmUtil;
 import com.sw.nam.client.ServerUtilities;
 
 public class ChatActivity extends ActionBarActivity implements MessagesFragment.OnFragmentInteractionListener, 
@@ -35,7 +31,7 @@ EditContactDialog.OnFragmentInteractionListener, OnClickListener {
 	private String profileId;
 	private String profileName;
 	private String profileEmail;
-	private GcmUtil gcmUtil;
+
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -67,10 +63,6 @@ EditContactDialog.OnFragmentInteractionListener, OnClickListener {
 			profileId = c.getString(c.getColumnIndex(DataProvider.COL_ID));
 			actionBar.setTitle(profileName);
 		}
-		actionBar.setSubtitle("connecting ...");
-
-		registerReceiver(registrationStatusReceiver, new IntentFilter(Common.ACTION_REGISTER));
-		gcmUtil = new GcmUtil(getApplicationContext());
 	}
 
 	@Override
@@ -159,27 +151,9 @@ EditContactDialog.OnFragmentInteractionListener, OnClickListener {
 
 	@Override
 	protected void onDestroy() {
-		unregisterReceiver(registrationStatusReceiver);
-		gcmUtil.cleanup();
 		super.onDestroy();
 	}
 
-	private BroadcastReceiver registrationStatusReceiver = new  BroadcastReceiver() {
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			if (intent != null && Common.ACTION_REGISTER.equals(intent.getAction())) {
-				switch (intent.getIntExtra(Common.EXTRA_STATUS, 100)) {
-				case Common.STATUS_SUCCESS:
-					getSupportActionBar().setSubtitle("online");
-					sendBtn.setEnabled(true);
-					break;
 
-				case Common.STATUS_FAILED:
-					getSupportActionBar().setSubtitle("offline");					
-					break;					
-				}
-			}
-		}
-	};	
 
 }

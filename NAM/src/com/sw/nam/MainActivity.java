@@ -1,13 +1,16 @@
 package com.sw.nam;
 
 import com.sw.nam.R;
+import com.sw.nam.client.GcmUtil;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -36,6 +39,7 @@ public class MainActivity extends ActionBarActivity implements
 	private ActionBar actionBar;
 	private ContactCursorAdapter ContactCursorAdapter;
 	public static PhotoCache photoCache;
+	private GcmUtil gcmUtil;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -52,9 +56,14 @@ public class MainActivity extends ActionBarActivity implements
 		actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME,
 				ActionBar.DISPLAY_SHOW_CUSTOM);
 		actionBar.setTitle("You are");
-		actionBar.setSubtitle(Common.getPreferredEmail());
+//		actionBar.setSubtitle(Common.getPreferredEmail());
 
 		getSupportLoaderManager().initLoader(0, null, this);
+		
+		actionBar.setSubtitle("connecting ...");
+
+		registerReceiver(registrationStatusReceiver, new IntentFilter(Common.ACTION_REGISTER));
+		gcmUtil = new GcmUtil(getApplicationContext());
 	}
 
 	@Override
@@ -89,6 +98,8 @@ public class MainActivity extends ActionBarActivity implements
 	protected void onDestroy() {
 		if (disclaimer != null)
 			disclaimer.dismiss();
+		unregisterReceiver(registrationStatusReceiver);
+		gcmUtil.cleanup();
 		super.onDestroy();
 	}
 
@@ -223,4 +234,21 @@ public class MainActivity extends ActionBarActivity implements
 		}
 		return uri;
 	}
+	
+	private BroadcastReceiver registrationStatusReceiver = new  BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			if (intent != null && Common.ACTION_REGISTER.equals(intent.getAction())) {
+				switch (intent.getIntExtra(Common.EXTRA_STATUS, 100)) {
+				case Common.STATUS_SUCCESS:
+					getSupportActionBar().setSubtitle(Common.getPreferredEmail());
+					break;
+
+				case Common.STATUS_FAILED:
+					getSupportActionBar().setSubtitle("Registration failed.");					
+					break;					
+				}
+			}
+		}
+	};
 }
