@@ -1,7 +1,5 @@
 package com.sw.nam;
 
-import com.sw.nam.R;
-
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.ContentResolver;
@@ -18,6 +16,9 @@ import android.support.v4.content.Loader;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -30,7 +31,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 public class MainActivity extends ActionBarActivity implements
-		LoaderManager.LoaderCallbacks<Cursor>, OnItemClickListener {
+		LoaderManager.LoaderCallbacks<Cursor>, OnItemClickListener{
 	private AlertDialog disclaimer;
 	ListView listView;
 	private ActionBar actionBar;
@@ -55,8 +56,31 @@ public class MainActivity extends ActionBarActivity implements
 		actionBar.setSubtitle(Common.getPreferredEmail());
 
 		getSupportLoaderManager().initLoader(0, null, this);
+		registerForContextMenu(listView);
 	}
 
+	@SuppressLint("NewApi")
+  @Override
+	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo)
+	{
+	  super.onCreateContextMenu(menu, v, menuInfo);
+	  
+	  menu.setHeaderTitle("Menu");
+	  menu.add(0, v.getId(), 0, "Delete");	   
+	}
+	
+	@Override
+	public boolean onContextItemSelected(MenuItem item)
+	{
+	  AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+	  Cursor cursor = (Cursor)listView.getItemAtPosition(info.position);
+	  String email = cursor.getString(cursor.getColumnIndex(DataProvider.COL_EMAIL));
+    getContentResolver().delete(DataProvider.CONTENT_URI_PROFILE, DataProvider.COL_EMAIL + " LIKE ?", new String[]{email});
+    getContentResolver().delete(DataProvider.CONTENT_URI_MESSAGES, DataProvider.COL_SENDER_EMAIL + " LIKE ? OR " 
+    + DataProvider.COL_RECEIVER_EMAIL + " LIKE ?", new String[]{email, email});
+	  return true;
+	}
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.main, menu);
@@ -84,7 +108,7 @@ public class MainActivity extends ActionBarActivity implements
 		intent.putExtra(Common.PROFILE_ID, String.valueOf(arg3));
 		startActivity(intent);
 	}
-
+	
 	@Override
 	protected void onDestroy() {
 		if (disclaimer != null)
@@ -223,4 +247,7 @@ public class MainActivity extends ActionBarActivity implements
 		}
 		return uri;
 	}
+
+
+
 }

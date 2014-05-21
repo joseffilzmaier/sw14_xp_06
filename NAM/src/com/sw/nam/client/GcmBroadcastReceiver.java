@@ -7,11 +7,13 @@ import android.content.BroadcastReceiver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.support.v4.app.NotificationCompat;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.sw.nam.ChatActivity;
@@ -42,6 +44,13 @@ public class GcmBroadcastReceiver extends BroadcastReceiver {
 				String msg = intent.getStringExtra(DataProvider.COL_MESSAGE);
 				String senderEmail = intent.getStringExtra(DataProvider.COL_SENDER_EMAIL);
 				String receiverEmail = intent.getStringExtra(DataProvider.COL_RECEIVER_EMAIL);
+				if(!contactExists(senderEmail, context))
+				{
+          ContentValues values = new ContentValues(2);
+          values.put(DataProvider.COL_NAME, senderEmail.substring(0, senderEmail.indexOf('@')));
+          values.put(DataProvider.COL_EMAIL, senderEmail);
+          context.getContentResolver().insert(DataProvider.CONTENT_URI_PROFILE, values);
+        }
 				ContentValues values = new ContentValues(2);
 				values.put(DataProvider.COL_TYPE,  MessageType.INCOMING.ordinal());				
 				values.put(DataProvider.COL_MESSAGE, msg);
@@ -58,6 +67,18 @@ public class GcmBroadcastReceiver extends BroadcastReceiver {
 			mWakeLock.release();
 		}
 	}
+	
+	private boolean contactExists(String senderEmail, Context context)
+	{
+	  Cursor c = context.getContentResolver().query(DataProvider.CONTENT_URI_PROFILE, 
+        null, DataProvider.COL_EMAIL + " LIKE ?", new String[]{senderEmail}, null);
+
+	  if(c.getCount()<1)
+	    return false;
+	  
+	  return true;
+	}
+	
 	private void newMessageNotification(String text,  String senderEmail) {
 		NotificationManager mNotificationManager = (NotificationManager) ctx.getSystemService(Context.NOTIFICATION_SERVICE);
 		NotificationCompat.Builder notification = new NotificationCompat.Builder(ctx);
@@ -72,7 +93,8 @@ public class GcmBroadcastReceiver extends BroadcastReceiver {
 		Intent intent = new Intent(ctx, ChatActivity.class);
 		intent.putExtra(Common.IS_NOTIF, true);
 		intent.putExtra(Common.PROFILE_NAME, senderEmail);
-//		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+		
 		PendingIntent pi = PendingIntent.getActivity(ctx, 0, intent, Intent.FLAG_ACTIVITY_NEW_TASK);
 		notification.setContentIntent(pi);
 		
