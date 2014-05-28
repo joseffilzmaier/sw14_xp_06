@@ -1,11 +1,16 @@
 package com.sw.nam;
 
+import com.sw.nam.R;
+import com.sw.nam.client.GcmUtil;
+
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -16,8 +21,6 @@ import android.support.v4.content.Loader;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
-import android.view.ContextMenu;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -30,12 +33,13 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 public class MainActivity extends ActionBarActivity implements
-		LoaderManager.LoaderCallbacks<Cursor>, OnItemClickListener{
+		LoaderManager.LoaderCallbacks<Cursor>, OnItemClickListener {
 	private AlertDialog disclaimer;
 	ListView listView;
 	private ActionBar actionBar;
 	private ContactCursorAdapter ContactCursorAdapter;
 	public static PhotoCache photoCache;
+	private GcmUtil gcmUtil;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -52,34 +56,16 @@ public class MainActivity extends ActionBarActivity implements
 		actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME,
 				ActionBar.DISPLAY_SHOW_CUSTOM);
 		actionBar.setTitle("You are");
-		actionBar.setSubtitle(Common.getPreferredEmail());
+//		actionBar.setSubtitle(Common.getPreferredEmail());
 
 		getSupportLoaderManager().initLoader(0, null, this);
-		registerForContextMenu(listView);
+		
+		actionBar.setSubtitle("connecting ...");
+
+		registerReceiver(registrationStatusReceiver, new IntentFilter(Common.ACTION_REGISTER));
+		gcmUtil = new GcmUtil(getApplicationContext());
 	}
 
-	@SuppressLint("NewApi")
-  @Override
-	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo)
-	{
-	  super.onCreateContextMenu(menu, v, menuInfo);
-	  
-	  menu.setHeaderTitle("Menu");
-	  menu.add(0, v.getId(), 0, "Delete");	   
-	}
-	
-	@Override
-	public boolean onContextItemSelected(MenuItem item)
-	{
-	  AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-	  Cursor cursor = (Cursor)listView.getItemAtPosition(info.position);
-	  String email = cursor.getString(cursor.getColumnIndex(DataProvider.COL_EMAIL));
-    getContentResolver().delete(DataProvider.CONTENT_URI_PROFILE, DataProvider.COL_EMAIL + " LIKE ?", new String[]{email});
-    getContentResolver().delete(DataProvider.CONTENT_URI_MESSAGES, DataProvider.COL_SENDER_EMAIL + " LIKE ? OR " 
-    + DataProvider.COL_RECEIVER_EMAIL + " LIKE ?", new String[]{email, email});
-	  return true;
-	}
-	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.main, menu);
@@ -107,11 +93,13 @@ public class MainActivity extends ActionBarActivity implements
 		intent.putExtra(Common.PROFILE_ID, String.valueOf(arg3));
 		startActivity(intent);
 	}
-	
+
 	@Override
 	protected void onDestroy() {
 		if (disclaimer != null)
 			disclaimer.dismiss();
+		unregisterReceiver(registrationStatusReceiver);
+		gcmUtil.cleanup();
 		super.onDestroy();
 	}
 
@@ -246,6 +234,21 @@ public class MainActivity extends ActionBarActivity implements
 		}
 		return uri;
 	}
+	
+	private BroadcastReceiver registrationStatusReceiver = new  BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			if (intent != null && Common.ACTION_REGISTER.equals(intent.getAction())) {
+				switch (intent.getIntExtra(Common.EXTRA_STATUS, 100)) {
+				case Common.STATUS_SUCCESS:
+					getSupportActionBar().setSubtitle(Common.getPreferredEmail());
+					break;
 
-
+				case Common.STATUS_FAILED:
+					getSupportActionBar().setSubtitle("Registration failed.");					
+					break;					
+				}
+			}
+		}
+	};
 }
