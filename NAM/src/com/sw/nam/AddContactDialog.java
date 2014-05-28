@@ -2,11 +2,10 @@ package com.sw.nam;
 
 import java.io.IOException;
 
-import com.sw.nam.client.ServerUtilities;
-
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -16,6 +15,9 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
+
+import com.sw.nam.client.ServerUtilities;
 
 public class AddContactDialog extends DialogFragment {
 	private AlertDialog alertDialog;
@@ -55,21 +57,8 @@ public class AddContactDialog extends DialogFragment {
 							return;
 						}
 						try {
-							String resp = friendrequest(email);
-							if (resp.equals("true")) {
-								ContentValues values = new ContentValues(2);
-								values.put(DataProvider.COL_NAME,
-										email.substring(0, email.indexOf('@')));
-								values.put(DataProvider.COL_EMAIL, email);
-								getActivity().getContentResolver().insert(
-										DataProvider.CONTENT_URI_PROFILE,
-										values);
-							} else {
-								AlertDialog alert = new AlertDialog.Builder(v
-										.getContext()).create();
-								alert.setMessage("Contact is not registered!!!");
-								alert.show();
-							}
+							new AddContactTask(getActivity().getApplicationContext()).execute(email);
+
 						} catch (Exception e) {
 						}
 						alertDialog.dismiss();
@@ -84,26 +73,44 @@ public class AddContactDialog extends DialogFragment {
 		return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches();
 	}
 
-	private String friendrequest(final String email) {
-		String result = " ";
-		try {
-			result = new AsyncTask<Void, Void, String>() {
-				@Override
-				protected String doInBackground(Void... params) {
-					String resp = "";
-					try {
-						resp = ServerUtilities.contactRequest(email);
-					} catch (IOException ex) {
-					}
-					return resp;
-				}
+	private class AddContactTask extends AsyncTask<String, Void, String> {
+	  private String email;
+	  private Context context;
+	  
+    public AddContactTask(Context context) {
+      this.context = context;
+    }
 
-				@Override
-				protected void onPostExecute(String result) {
-				}
-			}.execute(null, null, null).get();
-		} catch (Exception e) {
-		}
-		return result;
+    @Override
+    protected String doInBackground(String... params) {
+      email = params[0];
+    
+      String resp = "";
+      try {
+        resp = ServerUtilities.contactRequest(email);
+      } catch (IOException ex) {
+      }
+      return resp;
+    }
+
+    @Override
+    protected void onPostExecute(String result) {
+      if (result.equals("true")) {
+        ContentValues values = new ContentValues(2);
+        values.put(DataProvider.COL_NAME,
+            email.substring(0, email.indexOf('@')));
+        values.put(DataProvider.COL_EMAIL, email);
+        context.getContentResolver().insert(
+            DataProvider.CONTENT_URI_PROFILE,
+            values);
+        
+        Toast.makeText(context, email + " added!", Toast.LENGTH_SHORT).show();
+        
+      }
+      else
+      {
+        Toast.makeText(context, email + " is not registered!", Toast.LENGTH_LONG).show();
+      }
+    }
 	}
 }

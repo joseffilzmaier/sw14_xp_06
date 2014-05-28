@@ -98,8 +98,8 @@ public class GcmBroadcastReceiver extends BroadcastReceiver {
 		intent.putExtra(Common.IS_NOTIF, true);
 		intent.putExtra(Common.PROFILE_NAME, senderEmail);
 		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);		
-		//PendingIntent pi = PendingIntent.getActivity(ctx, 0, intent, Intent.FLAG_ACTIVITY_NEW_TASK);
-		PendingIntent pi = PendingIntent.getActivity(ctx, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+		PendingIntent pi = PendingIntent.getActivity(ctx, 0, intent, Intent.FLAG_ACTIVITY_NEW_TASK);
+		//PendingIntent pi = PendingIntent.getActivity(ctx, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 		notification.setContentIntent(pi);
 		
 		mNotificationManager.notify(1, notification.build());
