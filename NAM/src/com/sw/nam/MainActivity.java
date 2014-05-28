@@ -2,6 +2,7 @@ package com.sw.nam;
 
 import com.sw.nam.R;
 import com.sw.nam.client.GcmUtil;
+import com.sw.nam.EditContactDialog.OnFragmentInteractionListener;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
@@ -21,6 +22,8 @@ import android.support.v4.content.Loader;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -31,9 +34,10 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class MainActivity extends ActionBarActivity implements
-		LoaderManager.LoaderCallbacks<Cursor>, OnItemClickListener {
+		LoaderManager.LoaderCallbacks<Cursor>, OnItemClickListener, OnFragmentInteractionListener {
 	private AlertDialog disclaimer;
 	ListView listView;
 	private ActionBar actionBar;
@@ -59,6 +63,7 @@ public class MainActivity extends ActionBarActivity implements
 //		actionBar.setSubtitle(Common.getPreferredEmail());
 
 		getSupportLoaderManager().initLoader(0, null, this);
+		registerForContextMenu(listView);
 		
 		actionBar.setSubtitle("connecting ...");
 
@@ -66,6 +71,48 @@ public class MainActivity extends ActionBarActivity implements
 		gcmUtil = new GcmUtil(getApplicationContext());
 	}
 
+	@SuppressLint("NewApi")
+  @Override
+	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo)
+	{
+	  super.onCreateContextMenu(menu, v, menuInfo);
+	  menu.add(0, 0, 0, "Rename");
+	  menu.add(0, 1, 1, "Delete");
+	}
+	
+	@Override
+	public boolean onContextItemSelected(MenuItem item)
+	{	  
+	  AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+	  Cursor cursor = (Cursor)listView.getItemAtPosition(info.position);
+	  switch (item.getItemId()) 
+	  {
+    case 0:
+      String profileId = cursor.getString(cursor.getColumnIndex(DataProvider.COL_ID));
+      String name = cursor.getString(cursor.getColumnIndex(DataProvider.COL_NAME));
+      
+      EditContactDialog dialog = new EditContactDialog();
+      Bundle args = new Bundle();
+      args.putString(Common.PROFILE_ID, profileId);
+      args.putString(DataProvider.COL_NAME, name);
+      dialog.setArguments(args);
+      dialog.show(getSupportFragmentManager(), "EditContactDialog");
+      break;
+      
+    case 1:
+      String email = cursor.getString(cursor.getColumnIndex(DataProvider.COL_EMAIL));
+      getContentResolver().delete(DataProvider.CONTENT_URI_PROFILE, DataProvider.COL_EMAIL + " LIKE ?", new String[]{email});
+      getContentResolver().delete(DataProvider.CONTENT_URI_MESSAGES, DataProvider.COL_SENDER_EMAIL + " LIKE ? OR " 
+      + DataProvider.COL_RECEIVER_EMAIL + " LIKE ?", new String[]{email, email});
+      Toast.makeText(getApplicationContext(), "Contact deleted", Toast.LENGTH_SHORT).show();
+      break;
+      
+    default:
+      break;
+    }
+	  return true;
+	}
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.main, menu);
@@ -251,4 +298,10 @@ public class MainActivity extends ActionBarActivity implements
 			}
 		}
 	};
+
+  @Override
+  public void onEditContact(String name) {
+    // TODO Auto-generated method stub
+    
+  }
 }
