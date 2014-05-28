@@ -12,6 +12,7 @@ import android.support.v4.app.DialogFragment;
 import android.text.InputFilter;
 import android.text.TextUtils;
 import android.widget.EditText;
+import android.widget.Toast;
 
 public class EditContactDialog extends DialogFragment {
 	
@@ -53,6 +54,7 @@ public class EditContactDialog extends DialogFragment {
 					ctx.getContentResolver().update(Uri.withAppendedPath(DataProvider.CONTENT_URI_PROFILE, profileId), values, null, null);
 					
 					mListener.onEditContact(name);
+					Toast.makeText(ctx, "Contact saved", Toast.LENGTH_SHORT).show();
 				}
 			})
 			.setNegativeButton(android.R.string.cancel, null)
