@@ -6,6 +6,7 @@
     android:padding="6dip" >
 
     <ImageView
+        android:contentDescription="@string/avatar_description"
         android:id="@+id/avatar"
         android:layout_width="50dp"
         android:layout_height="50dp"
@@ -21,10 +22,11 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:layout_below="@+id/avatar"
+        android:layout_marginLeft="5dip"
         android:layout_marginTop="2dp"
         android:ellipsize="marquee"
         android:singleLine="true"
-        android:textSize="10sp" />
+        android:textSize="12sp" />
 
     <TextView
         android:id="@+id/text2"
