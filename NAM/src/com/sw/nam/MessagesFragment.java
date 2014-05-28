@@ -3,7 +3,9 @@ package com.sw.nam;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 import java.util.TimeZone;
 
 import com.sw.nam.R;
@@ -40,13 +42,15 @@ import android.widget.TextView;
  */
 public class MessagesFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
-	private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
 	private static final DateFormat[] df = new DateFormat[] {
 		DateFormat.getDateInstance(), DateFormat.getTimeInstance()};
 
 	private OnFragmentInteractionListener mListener;
 	private CursorAdapter chatCursorAdapter;
-	private Date now;
+	private Calendar now;
+	private Calendar date;
+	
 
 	@Override
 	public void onAttach(Activity activity) {
@@ -61,7 +65,8 @@ public class MessagesFragment extends ListFragment implements LoaderManager.Load
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		now = new Date();
+		now = Calendar.getInstance();
+		date = Calendar.getInstance();
 		chatCursorAdapter = new ChatCursorAdapter(getActivity(), null);
 		setListAdapter(chatCursorAdapter);
 	}	
@@ -91,12 +96,17 @@ public class MessagesFragment extends ListFragment implements LoaderManager.Load
 
 	private String getDisplayTime(String datetime) {
 		try {
+			
 			sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
 			Date dt = sdf.parse(datetime);
-			if (now.getYear()==dt.getYear() && now.getMonth()==dt.getMonth() && now.getDate()==dt.getDate()) {
+			date.setTime(dt);
+			
+			if (now.get(Calendar.YEAR)==date.get(Calendar.YEAR) && now.get(Calendar.MONTH)==date.get(Calendar.MONTH) && now.get(Calendar.DATE)==date.get(Calendar.DATE)) {
 				return df[1].format(dt);
 			}
+			
 			return df[0].format(dt);
+			
 		} catch (ParseException e) {
 			return datetime;
 		}

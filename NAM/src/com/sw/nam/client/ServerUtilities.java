@@ -28,8 +28,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
 
-import android.util.Log;
-
 import com.sw.nam.Common;
 import com.sw.nam.DataProvider;
 
