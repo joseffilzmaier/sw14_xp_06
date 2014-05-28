@@ -39,7 +39,7 @@ public class AddContactDialog extends DialogFragment {
 		et.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
 		et.setHint("abc@example.com");
 		alertDialog = new AlertDialog.Builder(getActivity())
-				.setTitle("Add Contact").setMessage("Add Contact")
+				.setTitle("Add Contact")
 				.setPositiveButton(android.R.string.ok, null)
 				.setNegativeButton(android.R.string.cancel, null).setView(et)
 				.create();
