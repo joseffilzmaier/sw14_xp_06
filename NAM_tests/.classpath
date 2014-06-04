@@ -6,6 +6,6 @@
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.DEPENDENCIES"/>
 	<classpathentry exported="true" kind="lib" path="libs/robotium-solo-5.0.1.jar"/>
-	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/NAMv2"/>
+	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/NAM"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>
