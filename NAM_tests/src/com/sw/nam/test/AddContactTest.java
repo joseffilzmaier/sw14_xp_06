@@ -19,7 +19,7 @@ public class AddContactTest extends ActivityInstrumentationTestCase2<MainActivit
   }
 
   protected void tearDown() throws Exception {
-    super.tearDown();
+    solo.finishOpenedActivities();
   }
   
   public void test1InvalidEmail() {
