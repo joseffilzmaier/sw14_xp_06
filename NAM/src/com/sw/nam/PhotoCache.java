@@ -52,39 +52,10 @@ public class PhotoCache {
 		if(bitmap != null)
 			imageView.setImageBitmap(bitmap);
 		else{
-			String[] mProjection = new String[]
-				    {
-				        Profile._ID,
-				        Profile.DISPLAY_NAME_PRIMARY,
-				        Profile.LOOKUP_KEY,
-				        Profile.PHOTO_THUMBNAIL_URI
-				    };
 
-				// Retrieves the profile from the Contacts Provider
-				Cursor mProfileCursor =
-				       context.getContentResolver().query(
-				                Profile.CONTENT_URI,
-				                mProjection ,
-				                null,
-				                null,
-				                null);
-				String pictureUri = "";
-				if (mProfileCursor.moveToFirst()) {
-					uri = Uri.parse(mProfileCursor.getString(mProfileCursor.getColumnIndex(Profile.PHOTO_THUMBNAIL_URI)));
-				}
-				InputStream in = null;
-				
-				if (uri != null) {
-			        try{
-			            in = context.getContentResolver().openInputStream(uri);
-			        }catch(FileNotFoundException e){
-			            e.printStackTrace();
-			        }
-			    }
-			imageView.setImageBitmap(BitmapFactory.decodeStream(in));
-//			PhotoStub p = new PhotoStub(uri, imageView);
-//			executorService.submit(new PhotoStubLoader(p));			
-//			imageView.setImageResource(stub_id);
+			PhotoStub p = new PhotoStub(uri, imageView);
+			executorService.submit(new PhotoStubLoader(p));			
+			imageView.setImageResource(stub_id);
 		}
 	}
 

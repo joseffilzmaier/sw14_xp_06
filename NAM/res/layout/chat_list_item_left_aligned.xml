@@ -35,6 +35,7 @@
         android:layout_centerVertical="true"
         android:layout_marginLeft="5dip"
         android:layout_toRightOf="@id/avatar"
+        android:background="@drawable/chat_list_item_left_shape"
         android:gravity="center_vertical" />
 
 </RelativeLayout>

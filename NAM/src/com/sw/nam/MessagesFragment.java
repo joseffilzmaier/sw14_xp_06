@@ -19,7 +19,6 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
-import android.provider.ContactsContract.Profile;
 import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -197,40 +196,19 @@ public class MessagesFragment extends ListFragment implements LoaderManager.Load
 		try{
 			int SDK_INT = android.os.Build.VERSION.SDK_INT;
 			if(SDK_INT >= 11){
-				
-				String[] mProjection = new String[]
-					    {
-					        Profile._ID,
-					        Profile.DISPLAY_NAME_PRIMARY,
-					        Profile.LOOKUP_KEY,
-					        Profile.PHOTO_THUMBNAIL_URI
-					    };
-
-					// Retrieves the profile from the Contacts Provider
-					Cursor mProfileCursor =
-					       getActivity().getContentResolver().query(
-					                Profile.CONTENT_URI,
-					                mProjection ,
-					                null,
-					                null,
-					                null);
-					String pictureUri = "";
-					if (mProfileCursor.moveToFirst()) {
-						uri = Uri.parse(mProfileCursor.getString(mProfileCursor.getColumnIndex(Profile.PHOTO_THUMBNAIL_URI)));
+				String[] projection = { ContactsContract.CommonDataKinds.Email.PHOTO_URI };
+				ContentResolver cr = getActivity().getContentResolver();
+				emailCur = cr.query(
+						ContactsContract.CommonDataKinds.Email.CONTENT_URI, projection,
+						ContactsContract.CommonDataKinds.Email.ADDRESS + " = ?", 
+								new String[]{email}, null);
+				if (emailCur != null && emailCur.getCount() > 0) {	
+					if (emailCur.moveToNext()) {
+						String photoUri = emailCur.getString( emailCur.getColumnIndex(ContactsContract.CommonDataKinds.Email.PHOTO_URI));
+						if(photoUri != null)
+							uri = Uri.parse(photoUri);
 					}
-//				String[] projection = { ContactsContract.CommonDataKinds.Email.PHOTO_URI };
-//				ContentResolver cr = getActivity().getContentResolver();
-//				emailCur = cr.query(
-//						ContactsContract.CommonDataKinds.Email.CONTENT_URI, projection,
-//						ContactsContract.CommonDataKinds.Email.ADDRESS + " = ?", 
-//								new String[]{email}, null);
-//				if (emailCur != null && emailCur.getCount() > 0) {	
-//					if (emailCur.moveToNext()) {
-//						String photoUri = emailCur.getString( emailCur.getColumnIndex(ContactsContract.CommonDataKinds.Email.PHOTO_URI));
-//						if(photoUri != null)
-//							uri = Uri.parse(photoUri);
-//					}
-//				}
+				}
 			}else if(SDK_INT < 11) {
 				String[] projection = { ContactsContract.CommonDataKinds.Photo.CONTACT_ID };
 				ContentResolver cr = getActivity().getContentResolver();
