@@ -24,7 +24,7 @@ import com.sw.nam.DataProvider.MessageType;
 import com.sw.nam.client.ServerUtilities;
 
 public class ChatActivity extends ActionBarActivity implements MessagesFragment.OnFragmentInteractionListener, 
-EditContactDialog.OnFragmentInteractionListener, OnClickListener {
+OnClickListener {
 
 	private EditText msgEdit;
 	private Button sendBtn;
@@ -63,25 +63,11 @@ EditContactDialog.OnFragmentInteractionListener, OnClickListener {
 			profileId = c.getString(c.getColumnIndex(DataProvider.COL_ID));
 			actionBar.setTitle(profileName);
 		}
-	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		getMenuInflater().inflate(R.menu.chat, menu);
-		return true;
 	}	
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-		case R.id.action_edit:
-			EditContactDialog dialog = new EditContactDialog();
-			Bundle args = new Bundle();
-			args.putString(Common.PROFILE_ID, profileId);
-			args.putString(DataProvider.COL_NAME, profileName);
-			dialog.setArguments(args);
-			dialog.show(getSupportFragmentManager(), "EditContactDialog");
-			return true;
 
 		case android.R.id.home:
 			Intent intent = new Intent(this, MainActivity.class);
@@ -100,11 +86,6 @@ EditContactDialog.OnFragmentInteractionListener, OnClickListener {
 			msgEdit.setText(null);
 			break;
 		}
-	}
-
-	@Override
-	public void onEditContact(String name) {
-		getSupportActionBar().setTitle(name);
 	}	
 
 	@Override
@@ -153,7 +134,5 @@ EditContactDialog.OnFragmentInteractionListener, OnClickListener {
 	protected void onDestroy() {
 		super.onDestroy();
 	}
-
-
 
 }
