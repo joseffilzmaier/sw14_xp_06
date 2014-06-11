@@ -47,7 +47,6 @@ OnClickListener {
 		
 		if(getIntent().getBooleanExtra(Common.IS_NOTIF, false)) {
 			String senderEmail = getIntent().getStringExtra(Common.PROFILE_NAME);
-			Log.d("main", senderEmail);
 			c = getContentResolver().query(DataProvider.CONTENT_URI_PROFILE, 
 					null, DataProvider.COL_EMAIL + " LIKE ?", new String[]{senderEmail}, null);
 

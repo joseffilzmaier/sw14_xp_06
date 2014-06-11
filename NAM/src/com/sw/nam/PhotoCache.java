@@ -1,6 +1,7 @@
 package com.sw.nam;
 
 import java.io.BufferedInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
@@ -12,13 +13,13 @@ import java.util.WeakHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import com.sw.nam.R;
-
 import android.app.Activity;
 import android.content.Context;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.provider.ContactsContract.Profile;
 import android.util.Log;
 import android.widget.ImageView;
 
@@ -51,9 +52,39 @@ public class PhotoCache {
 		if(bitmap != null)
 			imageView.setImageBitmap(bitmap);
 		else{
-			PhotoStub p = new PhotoStub(uri, imageView);
-			executorService.submit(new PhotoStubLoader(p));			
-			imageView.setImageResource(stub_id);
+			String[] mProjection = new String[]
+				    {
+				        Profile._ID,
+				        Profile.DISPLAY_NAME_PRIMARY,
+				        Profile.LOOKUP_KEY,
+				        Profile.PHOTO_THUMBNAIL_URI
+				    };
+
+				// Retrieves the profile from the Contacts Provider
+				Cursor mProfileCursor =
+				       context.getContentResolver().query(
+				                Profile.CONTENT_URI,
+				                mProjection ,
+				                null,
+				                null,
+				                null);
+				String pictureUri = "";
+				if (mProfileCursor.moveToFirst()) {
+					uri = Uri.parse(mProfileCursor.getString(mProfileCursor.getColumnIndex(Profile.PHOTO_THUMBNAIL_URI)));
+				}
+				InputStream in = null;
+				
+				if (uri != null) {
+			        try{
+			            in = context.getContentResolver().openInputStream(uri);
+			        }catch(FileNotFoundException e){
+			            e.printStackTrace();
+			        }
+			    }
+			imageView.setImageBitmap(BitmapFactory.decodeStream(in));
+//			PhotoStub p = new PhotoStub(uri, imageView);
+//			executorService.submit(new PhotoStubLoader(p));			
+//			imageView.setImageResource(stub_id);
 		}
 	}
 
