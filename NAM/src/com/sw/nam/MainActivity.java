@@ -1,21 +1,23 @@
 package com.sw.nam;
 
-import com.sw.nam.R;
-import com.sw.nam.client.GcmUtil;
-import com.sw.nam.EditContactDialog.OnFragmentInteractionListener;
+import java.io.File;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.ContentUris;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.provider.MediaStore;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
@@ -36,13 +38,16 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.sw.nam.EditContactDialog.OnFragmentInteractionListener;
+import com.sw.nam.client.GcmUtil;
+
 public class MainActivity extends ActionBarActivity implements
 		LoaderManager.LoaderCallbacks<Cursor>, OnItemClickListener, OnFragmentInteractionListener {
 	private AlertDialog disclaimer;
 	ListView listView;
 	private ActionBar actionBar;
 	private ContactCursorAdapter ContactCursorAdapter;
-	public static PhotoCache photoCache;
+	//public static PhotoCache photoCache;
 	private GcmUtil gcmUtil;
 
 	@Override
@@ -56,7 +61,7 @@ public class MainActivity extends ActionBarActivity implements
 		actionBar = getSupportActionBar();
 		actionBar.setDisplayShowTitleEnabled(true);
 		actionBar.show();
-		photoCache = new PhotoCache(this);
+		//photoCache = new PhotoCache(this);
 		actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME,
 				ActionBar.DISPLAY_SHOW_CUSTOM);
 		actionBar.setTitle(Common.getPreferredEmail());
@@ -77,6 +82,7 @@ public class MainActivity extends ActionBarActivity implements
 	  super.onCreateContextMenu(menu, v, menuInfo);
 	  menu.add(0, 0, 0, "Rename");
 	  menu.add(0, 1, 1, "Delete");
+	  menu.add(0, 2, 2, "Add Picture");
 	}
 	
 	@Override
@@ -106,10 +112,41 @@ public class MainActivity extends ActionBarActivity implements
       Toast.makeText(getApplicationContext(), "Contact deleted", Toast.LENGTH_SHORT).show();
       break;
       
+    case 2:
+    	profileId = cursor.getString(cursor.getColumnIndex(DataProvider.COL_ID));
+    	Intent i = new Intent(
+    			Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+    	i.putExtra(Common.PROFILE_ID, profileId);
+    	startActivityForResult(i, 1);
+    	break;
+      
     default:
       break;
     }
 	  return true;
+	}
+	
+	@Override
+	 protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+	     super.onActivityResult(requestCode, resultCode, data);
+	      
+	     if (requestCode == 1 && resultCode == RESULT_OK && null != data) {
+	         Uri selectedImage = data.getData();
+	         String[] filePathColumn = { MediaStore.Images.Media.DATA };
+	 
+	         Cursor cursor = getContentResolver().query(selectedImage,
+	                 filePathColumn, null, null, null);
+	         cursor.moveToFirst();
+	 
+	         int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+	         String picturePath = cursor.getString(columnIndex);
+	         cursor.close();
+
+	         String profileId = data.getStringExtra(Common.PROFILE_ID);
+	         ContentValues values = new ContentValues(1);
+			 values.put(DataProvider.COL_PICTURE, picturePath);
+			 getContentResolver().update(Uri.withAppendedPath(DataProvider.CONTENT_URI_PROFILE, profileId), values, null, null);
+	     }
 	}
 	
 	@Override
@@ -154,7 +191,7 @@ public class MainActivity extends ActionBarActivity implements
 		CursorLoader loader = new CursorLoader(this,
 				DataProvider.CONTENT_URI_PROFILE, new String[] {
 						DataProvider.COL_ID, DataProvider.COL_NAME,
-						DataProvider.COL_EMAIL, DataProvider.COL_COUNT }, null,
+						DataProvider.COL_EMAIL, DataProvider.COL_COUNT, DataProvider.COL_PICTURE }, null,
 				null, DataProvider.COL_ID + " DESC");
 		return loader;
 	}
@@ -213,9 +250,23 @@ public class MainActivity extends ActionBarActivity implements
 						count == 1 ? "" : "s"));
 			} else
 				holder.text2.setVisibility(View.GONE);
+			
+			String file = cursor.getString(cursor.getColumnIndex(DataProvider.COL_PICTURE));
+			if (file != "")
+			{
+				File imgFile = new  File(file);
+				if(imgFile.exists()){
+				    Bitmap bm = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
+				    holder.avatar.setImageBitmap(bm);
+				    //Drawable d = new BitmapDrawable(getResources(), myBitmap);
+				    //ImageView myImage = (ImageView) findViewById(R.id.imageviewTest);
+				    //myImage.setImageBitmap(myBitmap);
 
-			photoCache.DisplayBitmap(requestPhoto(cursor.getString(cursor
-					.getColumnIndex(DataProvider.COL_EMAIL))), holder.avatar);
+				}
+			}
+			
+			//photoCache.DisplayBitmap(requestPhoto(cursor.getString(cursor
+			//		.getColumnIndex(DataProvider.COL_EMAIL))), holder.avatar);
 
 		}
 	}

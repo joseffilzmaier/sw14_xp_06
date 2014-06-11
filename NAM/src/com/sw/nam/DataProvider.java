@@ -38,6 +38,8 @@ public class DataProvider extends ContentProvider {
 	public static final String COL_NAME = "name";
 	public static final String COL_EMAIL = "email";
 	public static final String COL_COUNT = "count";
+	
+	public static final String COL_PICTURE = "picture";
 
 	private DbHelper dbHelper;
 
@@ -208,7 +210,8 @@ public class DataProvider extends ContentProvider {
 					+ COL_ID + " integer primary key autoincrement, "
 					+ COL_NAME 	  +" text, "
 					+ COL_EMAIL   +" text unique, "
-					+ COL_COUNT   +" integer default 0);");
+					+ COL_COUNT   +" integer default 0,"
+					+ COL_PICTURE + " text default \"\");");
 		}
 
 		@Override

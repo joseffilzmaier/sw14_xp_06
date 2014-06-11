@@ -179,7 +179,7 @@ public class MessagesFragment extends ListFragment implements LoaderManager.Load
 			String email = cursor.getString(cursor.getColumnIndex(DataProvider.COL_SENDER_EMAIL));
 			holder.text1.setText(getDisplayTime(cursor.getString(cursor.getColumnIndex(DataProvider.COL_TIME))));
 			holder.text2.setText(cursor.getString(cursor.getColumnIndex(DataProvider.COL_MESSAGE)));
-			MainActivity.photoCache.DisplayBitmap(requestPhoto(email), holder.avatar);
+			//MainActivity.photoCache.DisplayBitmap(requestPhoto(email), holder.avatar);
 		}
 	}
 
