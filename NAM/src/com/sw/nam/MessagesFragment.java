@@ -184,8 +184,10 @@ public class MessagesFragment extends ListFragment implements LoaderManager.Load
 			holder.text2.setText(cursor.getString(cursor.getColumnIndex(DataProvider.COL_MESSAGE)));
 			Cursor c = context.getContentResolver().query(DataProvider.CONTENT_URI_PROFILE, 
 					null, DataProvider.COL_EMAIL + " LIKE ?", new String[]{email}, null);
-			c.moveToNext();
-			String file = c.getString(c.getColumnIndex(DataProvider.COL_PICTURE));
+			
+			String file = "";
+			if(c.moveToFirst())
+				file = c.getString(c.getColumnIndex(DataProvider.COL_PICTURE));
 
 			if (file != "")
 			{
