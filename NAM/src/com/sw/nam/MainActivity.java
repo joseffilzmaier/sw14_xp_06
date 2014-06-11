@@ -5,8 +5,6 @@ import java.io.File;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
-import android.content.ContentResolver;
-import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -16,7 +14,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.provider.MediaStore;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -24,6 +21,7 @@ import android.support.v4.content.Loader;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
@@ -47,9 +45,9 @@ public class MainActivity extends ActionBarActivity implements
 	ListView listView;
 	private ActionBar actionBar;
 	private ContactCursorAdapter ContactCursorAdapter;
-	//public static PhotoCache photoCache;
 	private GcmUtil gcmUtil;
-
+	private int profileID;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -61,7 +59,6 @@ public class MainActivity extends ActionBarActivity implements
 		actionBar = getSupportActionBar();
 		actionBar.setDisplayShowTitleEnabled(true);
 		actionBar.show();
-		//photoCache = new PhotoCache(this);
 		actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME,
 				ActionBar.DISPLAY_SHOW_CUSTOM);
 		actionBar.setTitle(Common.getPreferredEmail());
@@ -113,10 +110,10 @@ public class MainActivity extends ActionBarActivity implements
       break;
       
     case 2:
-    	profileId = cursor.getString(cursor.getColumnIndex(DataProvider.COL_ID));
+    	profileID = cursor.getInt(cursor.getColumnIndex(DataProvider.COL_ID));
+    	Log.v("tag", Integer.toString(profileID));
     	Intent i = new Intent(
     			Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-    	i.putExtra(Common.PROFILE_ID, profileId);
     	startActivityForResult(i, 1);
     	break;
       
@@ -142,10 +139,14 @@ public class MainActivity extends ActionBarActivity implements
 	         String picturePath = cursor.getString(columnIndex);
 	         cursor.close();
 
-	         String profileId = data.getStringExtra(Common.PROFILE_ID);
+	         Log.v("tag", "profile: " + profileID);
 	         ContentValues values = new ContentValues(1);
 			 values.put(DataProvider.COL_PICTURE, picturePath);
-			 getContentResolver().update(Uri.withAppendedPath(DataProvider.CONTENT_URI_PROFILE, profileId), values, null, null);
+			 
+			 getContentResolver().update(Uri.withAppendedPath(DataProvider.CONTENT_URI_PROFILE, Integer.toString(profileID)), values, null, null);
+			 
+			 //drawable_ic_contact_picture
+	     
 	     }
 	}
 	
@@ -252,18 +253,22 @@ public class MainActivity extends ActionBarActivity implements
 				holder.text2.setVisibility(View.GONE);
 			
 			String file = cursor.getString(cursor.getColumnIndex(DataProvider.COL_PICTURE));
+
 			if (file != "")
 			{
 				File imgFile = new  File(file);
 				if(imgFile.exists()){
+					//ExifInterface exif = new ExifInterface(file);
+					//if (exif )
 				    Bitmap bm = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
-				    holder.avatar.setImageBitmap(bm);
-				    //Drawable d = new BitmapDrawable(getResources(), myBitmap);
-				    //ImageView myImage = (ImageView) findViewById(R.id.imageviewTest);
-				    //myImage.setImageBitmap(myBitmap);
-
+				 
+				    holder.avatar.setImageBitmap(Bitmap.createScaledBitmap(bm, 32, 32, false));
 				}
+				else
+					holder.avatar.setImageResource(R.drawable.ic_contact_picture);
 			}
+			else
+				holder.avatar.setImageResource(R.drawable.ic_contact_picture);
 			
 			//photoCache.DisplayBitmap(requestPhoto(cursor.getString(cursor
 			//		.getColumnIndex(DataProvider.COL_EMAIL))), holder.avatar);
@@ -278,60 +283,60 @@ public class MainActivity extends ActionBarActivity implements
 		ImageView avatar;
 	}
 
-	@SuppressLint("InlinedApi")
-	private Uri requestPhoto(String email) {
-		Cursor emailCur = null;
-		Uri uri = null;
-		try {
-			int SDK_INT = android.os.Build.VERSION.SDK_INT;
-			if (SDK_INT >= 11) {
-				String[] projection = { ContactsContract.CommonDataKinds.Email.PHOTO_URI };
-				ContentResolver cr = getContentResolver();
-				emailCur = cr
-						.query(ContactsContract.CommonDataKinds.Email.CONTENT_URI,
-								projection,
-								ContactsContract.CommonDataKinds.Email.ADDRESS
-										+ " = ?", new String[] { email }, null);
-				if (emailCur != null && emailCur.getCount() > 0) {
-					if (emailCur.moveToNext()) {
-						String photoUri = emailCur
-								.getString(emailCur
-										.getColumnIndex(ContactsContract.CommonDataKinds.Email.PHOTO_URI));
-						if (photoUri != null)
-							uri = Uri.parse(photoUri);
-					}
-				}
-			} else if (SDK_INT < 11) {
-				String[] projection = { ContactsContract.CommonDataKinds.Photo.CONTACT_ID };
-				ContentResolver cr = getContentResolver();
-				emailCur = cr
-						.query(ContactsContract.CommonDataKinds.Email.CONTENT_URI,
-								projection,
-								ContactsContract.CommonDataKinds.Email.ADDRESS
-										+ " = ?", new String[] { email }, null);
-				if (emailCur.moveToNext()) {
-					int columnIndex = emailCur
-							.getColumnIndex(ContactsContract.CommonDataKinds.Photo.CONTACT_ID);
-					long contactId = emailCur.getLong(columnIndex);
-					uri = ContentUris.withAppendedId(
-							ContactsContract.Contacts.CONTENT_URI, contactId);
-					uri = Uri.withAppendedPath(uri,
-							ContactsContract.Contacts.Photo.CONTENT_DIRECTORY);
-				}
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				if (emailCur != null)
-					emailCur.close();
-			} catch (Exception ex) {
-				ex.printStackTrace();
-			}
-		}
-		return uri;
-	}
-	
+//	@SuppressLint("InlinedApi")
+//	private Uri requestPhoto(String email) {
+//		Cursor emailCur = null;
+//		Uri uri = null;
+//		try {
+//			int SDK_INT = android.os.Build.VERSION.SDK_INT;
+//			if (SDK_INT >= 11) {
+//				String[] projection = { ContactsContract.CommonDataKinds.Email.PHOTO_URI };
+//				ContentResolver cr = getContentResolver();
+//				emailCur = cr
+//						.query(ContactsContract.CommonDataKinds.Email.CONTENT_URI,
+//								projection,
+//								ContactsContract.CommonDataKinds.Email.ADDRESS
+//										+ " = ?", new String[] { email }, null);
+//				if (emailCur != null && emailCur.getCount() > 0) {
+//					if (emailCur.moveToNext()) {
+//						String photoUri = emailCur
+//								.getString(emailCur
+//										.getColumnIndex(ContactsContract.CommonDataKinds.Email.PHOTO_URI));
+//						if (photoUri != null)
+//							uri = Uri.parse(photoUri);
+//					}
+//				}
+//			} else if (SDK_INT < 11) {
+//				String[] projection = { ContactsContract.CommonDataKinds.Photo.CONTACT_ID };
+//				ContentResolver cr = getContentResolver();
+//				emailCur = cr
+//						.query(ContactsContract.CommonDataKinds.Email.CONTENT_URI,
+//								projection,
+//								ContactsContract.CommonDataKinds.Email.ADDRESS
+//										+ " = ?", new String[] { email }, null);
+//				if (emailCur.moveToNext()) {
+//					int columnIndex = emailCur
+//							.getColumnIndex(ContactsContract.CommonDataKinds.Photo.CONTACT_ID);
+//					long contactId = emailCur.getLong(columnIndex);
+//					uri = ContentUris.withAppendedId(
+//							ContactsContract.Contacts.CONTENT_URI, contactId);
+//					uri = Uri.withAppendedPath(uri,
+//							ContactsContract.Contacts.Photo.CONTENT_DIRECTORY);
+//				}
+//			}
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		} finally {
+//			try {
+//				if (emailCur != null)
+//					emailCur.close();
+//			} catch (Exception ex) {
+//				ex.printStackTrace();
+//			}
+//		}
+//		return uri;
+//	}
+//	
 	private BroadcastReceiver registrationStatusReceiver = new  BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {

@@ -13,7 +13,7 @@
         android:layout_alignParentLeft="true"
         android:adjustViewBounds="true"
         android:gravity="center_vertical"
-        android:scaleType="centerInside" />
+        android:scaleType="fitStart" />
 
     <TextView
         android:id="@+id/text1"

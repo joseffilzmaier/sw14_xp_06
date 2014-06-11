@@ -7,13 +7,13 @@
     <ImageView
         android:contentDescription="@string/avatar_description"
         android:id="@+id/avatar"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+        android:layout_width="60dip"
+        android:layout_height="60dip"
         android:layout_alignParentRight="true"
         android:layout_marginRight="5dip"
         android:adjustViewBounds="true"
         android:gravity="center_vertical" 
-        android:scaleType="centerInside"/>
+        android:scaleType="fitStart"/>
 
     <TextView
         android:id="@+id/text1"

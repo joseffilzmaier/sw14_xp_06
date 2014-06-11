@@ -1,5 +1,6 @@
 package com.sw.nam;
 
+import java.io.File;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -16,6 +17,8 @@ import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
@@ -179,8 +182,25 @@ public class MessagesFragment extends ListFragment implements LoaderManager.Load
 			String email = cursor.getString(cursor.getColumnIndex(DataProvider.COL_SENDER_EMAIL));
 			holder.text1.setText(getDisplayTime(cursor.getString(cursor.getColumnIndex(DataProvider.COL_TIME))));
 			holder.text2.setText(cursor.getString(cursor.getColumnIndex(DataProvider.COL_MESSAGE)));
-			//MainActivity.photoCache.DisplayBitmap(requestPhoto(email), holder.avatar);
-		}
+			Cursor c = context.getContentResolver().query(DataProvider.CONTENT_URI_PROFILE, 
+					null, DataProvider.COL_EMAIL + " LIKE ?", new String[]{email}, null);
+			c.moveToNext();
+			String file = c.getString(c.getColumnIndex(DataProvider.COL_PICTURE));
+
+			if (file != "")
+			{
+				File imgFile = new  File(file);
+				if(imgFile.exists()){
+				    Bitmap bm = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
+				 
+				    holder.avatar.setImageBitmap(Bitmap.createScaledBitmap(bm, 32, 32, false));
+				}
+				else
+					holder.avatar.setImageResource(R.drawable.ic_contact_picture);
+			}
+			else
+				holder.avatar.setImageResource(R.drawable.ic_contact_picture);
+			}
 	}
 
 	private static class ViewHolder {
