@@ -43,12 +43,7 @@ public class Common extends Application {
 		}
 		return lst;
 	}
-	/*
-	public static String getIdByEmail(String email) {
-		List<String> lst = getEmailList();
-		return String.valueOf(lst.indexOf(email));	
-	}
-	*/
+
 	public static String getPreferredEmail() {
 		return prefs.getString("chat_email_id", email_arr.length==0 ? "" : email_arr[0]);
 	}

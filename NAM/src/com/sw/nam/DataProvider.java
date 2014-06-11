@@ -21,13 +21,11 @@ public class DataProvider extends ContentProvider {
     	INCOMING, OUTGOING
     }
 	
-	//parameters recognized by demo server
 	public static final String SENDER_EMAIL 		= "senderEmail";
 	public static final String RECEIVER_EMAIL 		= "receiverEmail";	
 	public static final String REG_ID 				= "regId";
 	public static final String MESSAGE 				= "message";
 	
-	// TABLE MESSAGE
 	public static final String TABLE_MESSAGES 		= "messages";
 	public static final String COL_TYPE				= "type";
 	public static final String COL_SENDER_EMAIL 	= "senderEmail";
@@ -35,7 +33,6 @@ public class DataProvider extends ContentProvider {
 	public static final String COL_MESSAGE 			= "message";
 	public static final String COL_TIME 			= "time";
 
-	// TABLE PROFILE
 	public static final String TABLE_PROFILE = "profile";
 	public static final String COL_ID = "_id";
 	public static final String COL_NAME = "name";
@@ -48,7 +45,6 @@ public class DataProvider extends ContentProvider {
 	private static final int MESSAGES_SINGLE_ROW = 2;
 	private static final int PROFILE_ALLROWS = 3;
 	private static final int PROFILE_SINGLE_ROW = 4;
-	//private static final int PROFILE_SINGLE_ROW_NAME = 5;
 
 	private static final UriMatcher uriMatcher;
 	static {

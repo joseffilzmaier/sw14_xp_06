@@ -21,12 +21,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.util.Log;
 import android.widget.ImageView;
-/**
- * Keeps contact photos cached in memory.
- * Can also cache to disk (not in use because
- * contact images changed during sync)
- *
- */
+
 public class PhotoCache {
 
 	private static final String TAG = PhotoCache.class.getName();
@@ -46,12 +41,6 @@ public class PhotoCache {
 		this.context = context;
 	}
 
-	/**
-	 * Request Bitmap to be loaded in background
-	 * 
-	 * @param uri
-	 * @param imageView
-	 */
 	public void DisplayBitmap(Uri uri, ImageView imageView){
 		if(uri == null){
 			imageView.setImageResource(stub_id);
@@ -68,10 +57,6 @@ public class PhotoCache {
 		}
 	}
 
-	/**
-	 * Task for the queue
-	 *
-	 */
 	private class PhotoStub {
 		public Uri url;
 		public ImageView imageView;
@@ -82,10 +67,6 @@ public class PhotoCache {
 		}
 	}
 
-	/**
-	 * Task for the queue
-	 *
-	 */
 	class PhotoStubLoader implements Runnable {
 		PhotoStub photoToLoad;
 		PhotoStubLoader(PhotoStub photoToLoad){
@@ -105,12 +86,6 @@ public class PhotoCache {
 		}
 	}
 
-	/**
-	 * Create Bitmap
-	 * 
-	 * @param uri
-	 * @return
-	 */
 	private Bitmap getBitmap(Uri uri) {
 		Bitmap b;
 		try {
@@ -124,12 +99,6 @@ public class PhotoCache {
 		return null;
 	}
 
-	/**
-	 * Decodes inputStream and scales
-	 * 
-	 * @param inputStream
-	 * @return
-	 */
 	private Bitmap decodeRecourse(InputStream inputStream) {
 		try {
 
@@ -163,11 +132,6 @@ public class PhotoCache {
 		return null;
 	}
 
-	/**
-	 * If getView has recycled viewHolder 
-	 * @param photoToLoad
-	 * @return
-	 */
 	boolean imageViewReused(PhotoStub photoToLoad) {
 		Uri tag = imageViewsMap.get(photoToLoad.imageView);
 		if(tag == null || !tag.equals(photoToLoad.url)){
@@ -178,10 +142,6 @@ public class PhotoCache {
 		}
 	}
 
-	/**
-	 * Display bitmap in the UI thread
-	 *
-	 */
 	class BitmapDisplayer implements Runnable {
 		Bitmap bitmap;
 		PhotoStub photoToLoad;
@@ -200,12 +160,8 @@ public class PhotoCache {
 		}
 	}
 
-	/**
-	 * Clear on demand
-	 */
 	public void clearCache() {
 		cacheMemory.clear();
-		//fileCache.clear();
 	}
 
 	class CacheMemory {

@@ -15,16 +15,10 @@ import com.sw.nam.Common;
 
 public class GcmUtil {
 
-	// private static final String TAG = "GcmUtil";
-
 	public static final String PROPERTY_REG_ID = "registration_id";
 	private static final String PROPERTY_APP_VERSION = "appVersion";
 	private static final String PROPERTY_ON_SERVER_EXPIRATION_TIME = "onServerExpirationTimeMs";
 
-	/**
-	 * Default lifespan (7 days) of a reservation until it is considered
-	 * expired.
-	 */
 	public static final long REGISTRATION_EXPIRY_TIME_MS = 1000 * 3600 * 24 * 7;
 
 	private Context ctx;
@@ -46,14 +40,6 @@ public class GcmUtil {
 		gcm = GoogleCloudMessaging.getInstance(ctx);
 	}
 
-	/**
-	 * Gets the current registration id for application on GCM service.
-	 * <p>
-	 * If result is empty, the registration has failed.
-	 * 
-	 * @return registration id, or empty string if the registration is not
-	 *         complete.
-	 */
 	private String getRegistrationId() {
 		String registrationId = prefs.getString(PROPERTY_REG_ID, "");
 		if (registrationId.length() == 0) {
@@ -70,13 +56,6 @@ public class GcmUtil {
 		return registrationId;
 	}
 
-	/**
-	 * Stores the registration id, app versionCode, and expiration time in the
-	 * application's {@code SharedPreferences}.
-	 * 
-	 * @param regId
-	 *            registration id
-	 */
 	private void setRegistrationId(String regId) {
 		int appVersion = getAppVersion();
 		SharedPreferences.Editor editor = prefs.edit();
@@ -89,42 +68,22 @@ public class GcmUtil {
 		editor.commit();
 	}
 
-	/**
-	 * @return Application's version code from the {@code PackageManager}.
-	 */
 	private int getAppVersion() {
 		try {
 			PackageInfo packageInfo = ctx.getPackageManager().getPackageInfo(
 					ctx.getPackageName(), 0);
 			return packageInfo.versionCode;
 		} catch (NameNotFoundException e) {
-			// should never happen
 			throw new RuntimeException("Could not get package name: " + e);
 		}
 	}
 
-	/**
-	 * Checks if the registration has expired.
-	 * 
-	 * <p>
-	 * To avoid the scenario where the device sends the registration to the
-	 * server but the server loses it, the app developer may choose to
-	 * re-register after REGISTRATION_EXPIRY_TIME_MS.
-	 * 
-	 * @return true if the registration has expired.
-	 */
 	private boolean isRegistrationExpired() {
 		long expirationTime = prefs.getLong(PROPERTY_ON_SERVER_EXPIRATION_TIME,
 				-1);
 		return System.currentTimeMillis() > expirationTime;
 	}
 
-	/**
-	 * Registers the application with GCM servers asynchronously.
-	 * <p>
-	 * Stores the registration id, app versionCode, and expiration time in the
-	 * application's shared preferences.
-	 */
 	private void registerBackground() {
 		registrationTask = new AsyncTask<Void, Void, Boolean>() {
 			@Override

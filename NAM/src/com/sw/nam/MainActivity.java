@@ -59,8 +59,7 @@ public class MainActivity extends ActionBarActivity implements
 		photoCache = new PhotoCache(this);
 		actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME,
 				ActionBar.DISPLAY_SHOW_CUSTOM);
-		actionBar.setTitle("You are");
-//		actionBar.setSubtitle(Common.getPreferredEmail());
+		actionBar.setTitle(Common.getPreferredEmail());
 
 		getSupportLoaderManager().initLoader(0, null, this);
 		registerForContextMenu(listView);
@@ -288,7 +287,7 @@ public class MainActivity extends ActionBarActivity implements
 			if (intent != null && Common.ACTION_REGISTER.equals(intent.getAction())) {
 				switch (intent.getIntExtra(Common.EXTRA_STATUS, 100)) {
 				case Common.STATUS_SUCCESS:
-					getSupportActionBar().setSubtitle(Common.getPreferredEmail());
+					getSupportActionBar().setSubtitle("Online");
 					break;
 
 				case Common.STATUS_FAILED:
@@ -300,8 +299,6 @@ public class MainActivity extends ActionBarActivity implements
 	};
 
   @Override
-  public void onEditContact(String name) {
-    // TODO Auto-generated method stub
-    
+  public void onEditContact(String name) { 
   }
 }

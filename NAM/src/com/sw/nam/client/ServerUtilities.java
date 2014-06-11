@@ -31,22 +31,12 @@ import java.util.Random;
 import com.sw.nam.Common;
 import com.sw.nam.DataProvider;
 
-/**
- * Helper class used to communicate with the demo server.
- */
 public final class ServerUtilities {
-
-	// private static final String TAG = "ServerUtilities";
 
 	private static final int MAX_ATTEMPTS = 5;
 	private static final int BACKOFF_MILLI_SECONDS = 2000;
 	private static final Random random = new Random();
 
-	/**
-	 * Register this account/device pair within the server.
-	 * 
-	 * @throws IOException
-	 */
 	public static void register(final String email, final String regId)
 			throws IOException {
 
@@ -62,9 +52,6 @@ public final class ServerUtilities {
 		}
 	}
 
-	/**
-	 * Unregister this account/device pair within the server.
-	 */
 	public static void unregister(final String email) {
 
 		String serverUrl = Common.getServerUrl() + "/unregister";
@@ -77,9 +64,6 @@ public final class ServerUtilities {
 		}
 	}
 
-	/**
-	 * Send a message.
-	 */
 	public static void send(String msg, String to) throws IOException {
 
 		String serverUrl = Common.getServerUrl() + "/send";
@@ -90,9 +74,6 @@ public final class ServerUtilities {
 		post(serverUrl, params, MAX_ATTEMPTS);
 	}
 
-	/**
-	 * Add a contact.
-	 */
 	public static String contactRequest(String email) throws IOException {
 
 		String response = " ";
@@ -103,7 +84,6 @@ public final class ServerUtilities {
 		return response;
 	}
 
-	/** Issue a POST with exponential backoff */
 	private static String post(String endpoint, Map<String, String> params,
 			int maxAttempts) throws IOException {
 		long backoff = BACKOFF_MILLI_SECONDS + random.nextInt(1000);
@@ -132,22 +112,10 @@ public final class ServerUtilities {
 		return response;
 	}
 
-	/**
-	 * Issue a POST request to the server.
-	 * 
-	 * @param endpoint
-	 *            POST address.
-	 * @param params
-	 *            request parameters.
-	 * 
-	 * @throws IOException
-	 *             propagated from POST.
-	 */
 	private static String post(String endpoint, Map<String, String> params)
 			throws IOException {
 		URL url;
 		StringBuffer response = new StringBuffer();
-		// String response = " ";
 		try {
 			url = new URL(endpoint);
 		} catch (MalformedURLException e) {
